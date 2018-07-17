@@ -1,0 +1,20 @@
+version: '3.1'
+
+volumes:
+    grafana_data: {}
+
+networks:
+  front-tier:
+    external:
+      name: simple-prometheus-monitoring_front-tier
+
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning/:/etc/grafana/provisioning/
+    networks:
+      - front-tier

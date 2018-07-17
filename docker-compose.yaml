@@ -1,0 +1,38 @@
+version: '3.1'
+
+volumes:
+    prometheus_data: {}
+
+networks:
+  front-tier:
+    driver: bridge
+
+  back-tier:
+    driver: bridge
+
+
+services:
+
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:      
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+    networks:
+      - back-tier
+      - front-tier
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    networks:
+      - back-tier
+    command:
+      - '--storage.path=/alertmanager'

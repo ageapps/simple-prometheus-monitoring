@@ -1,0 +1,36 @@
+version: '3.1'
+
+volumes:
+    grafana_data: {}
+
+networks:
+  back-tier:
+    external:
+      name: simple-prometheus-monitoring_back-tier
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    networks:
+      - back-tier
+    hostname: rabbit
+    ports:
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=user
+      - RABBITMQ_NODENAME=my-rabbit
+
+  rabbit-exporter:
+    image: kbudde/rabbitmq-exporter
+    networks:
+      - back-tier
+    hostname: rabbit-exporter
+    ports:
+      - 9419:9419
+    environment:
+      - RABBIT_USER=user
+      - RABBIT_PASSWORD=user
+      - PUBLISH_PORT=9419
+      - RABBIT_CAPABILITIES=bert,no_sort
+      - RABBIT_URL=http://rabbit:15672
